@@ -13,7 +13,7 @@ def ingresar_matriz(nombre):
     return np.array(datos)
 
 while True:
-    print("\n--- Calculadora Matricial ---")
+    print("\nCalculadora de Matrices")
     print("1. Suma")
     print("2. Resta")
     print("3. Multiplicación")
