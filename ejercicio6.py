@@ -1,14 +1,17 @@
 import requests
 
 URL = "https://example.com/login"   
-USUARIO = "admin"                   
+USUARIO = "admin"
 
 def leer_contrasenas():
     try:
-        with open("contraseñas.txt", "r") as f:
-            return [c.strip() for c in f if c.strip()]
+        with open("contraseñas.txt", "r", encoding="utf-8") as f:
+            lineas = [c.strip() for c in f if c.strip()]
+        if not lineas:
+            print("El archivo 'contraseñas.txt' está vacío.")
+        return lineas
     except FileNotFoundError:
-        print("No se encontró 'contraseñas.txt'")
+        print("No se encontró el archivo 'contraseñas.txt'.")
         return []
 
 def probar(contrasenas):
