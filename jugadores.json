@@ -1,0 +1,55 @@
+{
+    "eduardo": {
+        "clase": "purgador oscuro",
+        "nivel": 1,
+        "vida": 100,
+        "inventario": {
+            "pocion": 1
+        },
+        "decisiones": [],
+        "energia": 50,
+        "ataques": [
+            {
+                "nombre": "Golpe b\u00e1sico",
+                "da\u00f1o": [
+                    5,
+                    15
+                ],
+                "costo": 5
+            }
+        ],
+        "equipamiento": []
+    },
+    "ratman": {
+        "clase": "humano",
+        "nivel": 4,
+        "vida": -22,
+        "energia": 50,
+        "inventario": {
+            "pocion": 0,
+            "armadura": 1,
+            "espada": 2,
+            "poci\u00f3n": 1
+        },
+        "ataques": [
+            {
+                "nombre": "Golpe b\u00e1sico",
+                "da\u00f1o": [
+                    5,
+                    15
+                ],
+                "costo": 5
+            },
+            {
+                "nombre": "Ataque Fuerte",
+                "da\u00f1o": [
+                    15,
+                    25
+                ],
+                "costo": 10
+            }
+        ],
+        "equipamiento": [],
+        "decisiones": []
+    }
+}
