@@ -60,6 +60,7 @@ def registrar_jugador(jugadores):
     }
     jugadores[nombre]=jugador
     print(f"\n¡Tu aventura comienza! {nombre}, serás un {clase.capitalize()} con 100 vida y 50 energía.\n")
+    guardar_jugadores(jugadores)
     return nombre
 
 # -------------------------
@@ -120,7 +121,7 @@ def mostrar_inventario_combate(jugador):
 
     if eleccion == len(lista_objetos) or eleccion<0 or eleccion>=len(lista_objetos):
         print("Cancelado.")
-        return 0,0  # ningún efecto
+        return 0,0
     item = lista_objetos[eleccion]
 
     efecto_dano = 0
@@ -143,7 +144,7 @@ def mostrar_inventario_combate(jugador):
 # -------------------------
 # Combate
 # -------------------------
-def combate(jugador, enemigo):
+def combate(jugador, enemigo, jugadores):
     print(f"\n¡Te enfrentas a {enemigo['nombre']}! Vida: {enemigo['vida']} | Energía: {enemigo['energia']}")
     buff_dano = 0
     reduccion_dano = 0
@@ -153,6 +154,7 @@ def combate(jugador, enemigo):
         for i, atk in enumerate(jugador["ataques"],1):
             print(f"{i}. {atk['nombre']} (Costo: {atk['costo']})")
         print(f"{len(jugador['ataques'])+1}. Usar objeto")
+        print(f"{len(jugador['ataques'])+2}. Salir y guardar")
 
         try:
             elec = int(input("Elige acción: "))-1
@@ -163,7 +165,12 @@ def combate(jugador, enemigo):
             efecto_d, reduccion = mostrar_inventario_combate(jugador)
             buff_dano += efecto_d
             reduccion_dano += reduccion
+            guardar_jugadores(jugadores)
             continue
+        elif elec==len(jugador['ataques'])+1:
+            guardar_jugadores(jugadores)
+            print("Juego guardado. Saliendo del combate...")
+            exit()
         elif elec<0 or elec>=len(jugador['ataques']):
             elec=0
 
@@ -184,6 +191,7 @@ def combate(jugador, enemigo):
             desbloquear_habilidades(jugador)
             loot(jugador)
             jugador["energia"]=50
+            guardar_jugadores(jugadores)
             return
 
         atk_enem=random.choice(enemigo["ataques"])
@@ -194,10 +202,33 @@ def combate(jugador, enemigo):
         print(f"{enemigo['nombre']} usó {atk_enem['nombre']} y causó {daño_enem}. Vida actual: {max(jugador['vida'],0)}")
 
 # -------------------------
-# Escenas lineales
+# Escenas de exploración y diálogos
 # -------------------------
-def escena_pueblo(jugador):
-    atacante = ""
+def escena_exploracion(jugador,jugadores):
+    print("\nExploras el entorno...")
+    opciones = ["Investigar la aldea","Seguir el río","Subir la colina"]
+    elec = pedir_opcion("Qué haces?", opciones)
+    if elec==0:
+        print("Encuentras enemigos mientras investigas...")
+        combate(jugador, enemigo_random(), jugadores)
+    elif elec==1:
+        print("Encuentras a un anciano sabio que te da información y algún objeto.")
+        loot(jugador)
+        guardar_jugadores(jugadores)
+    else:
+        print("Subes la colina y encuentras un lugar seguro para descansar.")
+        jugador["vida"]=min(100,jugador["vida"]+10)
+        jugador["energia"]=50
+        print(f"Vida y energía restauradas. Vida: {jugador['vida']} | Energía: {jugador['energia']}")
+    guardar_jugadores(jugadores)
+
+# -------------------------
+# Historia lineal con jefe final
+# -------------------------
+def aventura_completa(jugador, jugadores, nombre):
+    print("\n--- Inicia la historia ---")
+    # Escena inicial
+    atacante=""
     if jugador["clase"]=="humano" or jugador["clase"]=="nephilim":
         atacante="demonios"
     elif jugador["clase"]=="demonio":
@@ -205,43 +236,21 @@ def escena_pueblo(jugador):
     else:
         atacante="purgadores"
     print(f"\nTu pueblo es atacado por {atacante}!")
-    combate(jugador, enemigo_random())
-    if jugador["vida"]<=0: return False
-    return True
-
-def escena_bosque(jugador):
-    print("\nExploras el bosque cercano...")
-    for _ in range(2):
-        print("Encuentras enemigos mientras exploras.")
-        combate(jugador, enemigo_random())
-        if jugador["vida"]<=0: return False
-        loot(jugador)
-    return True
-
-def escena_cueva(jugador):
-    print("\nHas llegado a una cueva misteriosa...")
-    print("Aparece un jefe intermedio!")
-    combate(jugador, jefe_final())
-    if jugador["vida"]<=0: return False
-    return True
-
-# -------------------------
-# Aventura completa
-# -------------------------
-def aventura_completa(jugador, jugadores, nombre):
-    print("\n--- Inicia la historia ---")
-    if not escena_pueblo(jugador):
-        print("\n¡Has muerto! Fin de la aventura."); return
-    if not escena_bosque(jugador):
-        print("\n¡Has muerto! Fin de la aventura."); return
-    if not escena_cueva(jugador):
-        print("\n¡Has muerto! Fin de la aventura."); return
-
-    print("\n¡Has llegado al jefe final!")
-    combate(jugador, jefe_final())
+    combate(jugador, enemigo_random(), jugadores)
     if jugador["vida"]<=0:
-        print("\n¡Has muerto ante el jefe final! Fin de la aventura.")
-        return
+        print("\n¡Has muerto! Fin de la aventura."); return
+
+    # Exploraciones con enemigos aleatorios y loot
+    for _ in range(2):
+        escena_exploracion(jugador,jugadores)
+        if jugador["vida"]<=0:
+            print("\n¡Has muerto! Fin de la aventura."); return
+
+    # Jefe final
+    print("\n¡Has llegado al jefe final!")
+    combate(jugador, jefe_final(), jugadores)
+    if jugador["vida"]<=0:
+        print("\n¡Has muerto ante el jefe final! Fin de la aventura."); return
 
     print("\n¡Felicidades! Has completado la aventura.")
     jugador["energia"]=50
