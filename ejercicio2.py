@@ -19,7 +19,7 @@ while True:
     print("3. Multiplicación")
     print("4. Transposición")
     print("5. Salir")
-    op = input("Seleccione opción: ")
+    op = input("Seleccione una opción: ")
 
     if op in ["1", "2", "3"]:
         A, B = ingresar_matriz("A"), ingresar_matriz("B")
