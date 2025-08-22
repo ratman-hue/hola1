@@ -1,0 +1,2 @@
+eduardo,10.0
+felipe,5.0
